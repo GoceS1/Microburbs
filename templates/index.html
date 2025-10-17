@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Investment Dashboard | Microburbs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <rect width="32" height="32" rx="6" fill="#2563eb"/>
+                        <path d="M16 8L8 14V24H13V18H19V24H24V14L16 8Z" fill="white"/>
+                    </svg>
+                    <h1>Property Investment Dashboard</h1>
+                </div>
+                <div class="header-badge">
+                    <span class="badge">Powered by Microburbs API</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            
+            <!-- Controls Section -->
+            <section class="controls-section">
+                <div class="control-group">
+                    <label for="suburb-select">Select Suburb:</label>
+                    <select id="suburb-select" class="select-dropdown">
+                        <option value="">Choose a suburb...</option>
+                        {% for suburb in suburbs %}
+                        <option value="{{ suburb.gnaf_id }}" data-name="{{ suburb.display_name }}">
+                            {{ suburb.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>Time Period:</label>
+                    <div class="button-group" id="period-buttons">
+                        <button class="btn btn-period" data-period="1y">1 Year</button>
+                        <button class="btn btn-period" data-period="5y">5 Years</button>
+                        <button class="btn btn-period active" data-period="10y">10 Years</button>
+                        <button class="btn btn-period" data-period="all">All Time</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loading State -->
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Loading market data...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="error" class="error-message hidden">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <h3>Unable to load data</h3>
+                <p id="error-message"></p>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div id="dashboard-content" class="dashboard-content hidden">
+                
+                <!-- Property Info -->
+                <div class="property-info" id="property-info">
+                    <h2 id="property-address">Select a suburb to view market insights</h2>
+                    <p id="property-details"></p>
+                </div>
+
+                <!-- KPI Cards -->
+                <section class="kpi-section">
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                        </div>
+                        <div class="kpi-content">
+                            <h3>Median Price</h3>
+                            <p class="kpi-value" id="kpi-median-price">-</p>
+                            <span class="kpi-label">Current market value</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                <polyline points="17 6 23 6 23 12"></polyline>
+                            </svg>
+                        </div>
+                        <div class="kpi-content">
+                            <h3>5-Year Growth</h3>
+                            <p class="kpi-value" id="kpi-growth">-</p>
+                            <span class="kpi-label">Capital appreciation</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                        </div>
+                        <div class="kpi-content">
+                            <h3>Rental Yield</h3>
+                            <p class="kpi-value" id="kpi-yield">-</p>
+                            <span class="kpi-label">Average annual return</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Charts Section -->
+                <section class="charts-section">
+                    <!-- Price Chart -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                    <polyline points="17 6 23 6 23 12"></polyline>
+                                </svg>
+                                Capital Growth Over Time
+                            </h3>
+                            <p>Median property prices by region</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="price-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Yield Chart -->
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                </svg>
+                                Rental Yield Trends
+                            </h3>
+                            <p>Rental return percentage over time</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="yield-chart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Transactions Table -->
+                <section class="transactions-section" id="transactions-section">
+                    <h3>Property Transaction History</h3>
+                    <div class="table-container">
+                        <table id="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Address</th>
+                                    <th>Price</th>
+                                    <th>Type</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-body">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Built with Flask & Vanilla JavaScript | Data from <a href="https://www.microburbs.com.au" target="_blank">Microburbs API</a></p>
+        </div>
+    </footer>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
+
