@@ -28,13 +28,14 @@ A property investment dashboard built with **Flask** and **vanilla JavaScript** 
 
 ## 🚀 Setup & Installation
 
-### 1. Clone or Download
+### 1. Clone the Repository
 
 ```bash
-cd microburbs
+git clone https://github.com/GoceS1/Microburbs.git
+cd Microburbs
 ```
 
-### 2. Create Virtual Environment
+### 2. Create Virtual Environment (Optional but Recommended)
 
 ```bash
 python3 -m venv venv
@@ -47,66 +48,42 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 4. Configure API Key
-
-Create a `.env` file:
+### 4. Run the Dashboard
 
 ```bash
-cp .env.example .env
-```
-
-Edit `.env` and add your Microburbs API key:
-
-```
-MICROBURBS_API_KEY=your_actual_api_key_here
-```
-
-### 5. Test API Data (Optional)
-
-Before building the dashboard, verify the API works:
-
-```bash
-python test_api.py
-```
-
-This will check:
-- ✅ API endpoints are accessible
-- ✅ Data structure is correct
-- ✅ Historical data is available (1y, 5y, 10y)
-
-### 6. Run the Dashboard
-
-```bash
-python app.py
+python3 app.py
 ```
 
 Visit: **http://localhost:5000**
 
+The app uses the **Microburbs sandbox API** by default (API key: `"test"`), which provides access to demo data for one property with 22+ years of historical market data.
+
+### 5. Optional: Use Your Own API Key
+
+If you have a production Microburbs API key, set it as an environment variable:
+
+```bash
+export MICROBURBS_API_KEY=your_actual_api_key_here
+python3 app.py
+```
+
 ## 📁 Project Structure
 
 ```
-microburbs/
-├── app.py                  # Flask backend
+Microburbs/
+├── app.py                  # Flask backend with API integration
 ├── static/
 │   ├── css/
 │   │   └── style.css       # Dashboard styles
 │   └── js/
-│       └── dashboard.js    # Frontend logic & charts
+│       └── dashboard.js    # Frontend logic & Chart.js visualizations
 ├── templates/
 │   └── index.html          # Main dashboard page
-├── mock_data.json          # Sample data for testing
-├── test_api.py             # API validation script
 ├── requirements.txt        # Python dependencies
-├── .env                    # API configuration (not in git)
-└── README.md               # This file
+├── README.md               # This file
+├── DEMO_INSTRUCTIONS.md    # Detailed demo guide
+└── .gitignore             # Git ignore rules
 ```
-
-## 🧪 Using Mock Data
-
-If you don't have an API key or want to test without hitting the API:
-
-1. Set `USE_MOCK_DATA=true` in `.env`
-2. The app will use `mock_data.json` instead
 
 ## 📊 API Endpoints Used
 
@@ -145,21 +122,16 @@ If you don't have an API key or want to test without hitting the API:
 - Ensure Chart.js/Plotly is loaded
 - Clear browser cache
 
-## 📝 Development Notes
+## 📝 Data Source
 
-### Data Validation Checklist
-- [ ] API endpoints confirmed working
-- [ ] Time series data available (1y, 5y, 10y)
-- [ ] Both sell_price and yield metrics available
-- [ ] Suburb list endpoint exists (or hardcoded)
+The dashboard uses the **Microburbs API sandbox** which provides:
+- ✅ Real property market data (not mock/fake data)
+- ✅ 22+ years of historical price trends
+- ✅ 380+ rental yield data points
+- ✅ Multi-level geographic comparisons (Suburb, SA3 Region, City Region)
+- ✅ Actual property transaction history
 
-### Next Steps
-1. ✅ Validate API data structure
-2. ⏳ Build Flask backend
-3. ⏳ Create frontend UI
-4. ⏳ Implement charts
-5. ⏳ Add caching
-6. ⏳ Polish UI/UX
+**Demo Property**: 27 Arlington Street, Belmont North, NSW
 
 ## 📄 License
 
